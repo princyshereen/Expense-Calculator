@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Personal Expense Calculator</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 30px 15px;
+    color: #222;
+  }
+  .card {
+    max-width: 500px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 25px 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h1 {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #444;
+  }
+  input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  button {
+    margin-top: 16px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #2e86de;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  button:hover { background: #206bb5; }
+  button.secondary {
+    background: #eee;
+    color: #333;
+  }
+  button.secondary:hover { background: #ddd; }
+  .expense-list {
+    margin-top: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+  }
+  .expense-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 4px 0;
+    border-bottom: 1px dashed #eee;
+  }
+  .summary {
+    margin-top: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 15px;
+  }
+  .summary p {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 14px;
+  }
+  .summary strong { font-size: 16px; }
+  .savings-positive { color: #27ae60; }
+  .savings-negative { color: #c0392b; }
+  .category-breakdown {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Personal Expense Calculator</h1>
+
+  <label for="income">Monthly Income (₹)</label>
+  <input type="number" id="income" placeholder="e.g. 30000">
+
+  <label for="expAmount">Amount (₹)</label>
+  <input type="number" id="expAmount" placeholder="e.g. 1500">
+
+  <label for="expCategory">Category</label>
+  <select id="expCategory">
+    <option>Food</option>
+    <option>Rent</option>
+    <option>Transport</option>
+    <option>Entertainment</option>
+    <option>Utilities</option>
+    <option>Other</option>
+  </select>
+
+  <button onclick="addExpense()">Add Expense</button>
+  <button class="secondary" onclick="resetAll()">Reset</button>
+
+  <div class="expense-list" id="expenseList"></div>
+
+  <div class="summary" id="summary" style="display:none;">
+    <p><strong>Total Income</strong> <span id="sumIncome"></span></p>
+    <p><strong>Total Expenses</strong> <span id="sumExpenses"></span></p>
+    <p><strong>Savings</strong> <span id="sumSavings"></span></p>
+    <div class="category-breakdown" id="categoryBreakdown"></div>
+  </div>
+</div>
+
+<script>
+  let expenses = [];
+
+  function addExpense() {
+    const amount = parseFloat(document.getElementById('expAmount').value);
+    const category = document.getElementById('expCategory').value;
+
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid amount.');
+      return;
+    }
+
+    expenses.push({ amount, category });
+
+    document.getElementById('expAmount').value = '';
+
+    renderExpenses();
+    updateSummary();
+  }
+
+  function renderExpenses() {
+    const list = document.getElementById('expenseList');
+    list.innerHTML = '';
+    expenses.forEach(exp => {
+      const div = document.createElement('div');
+      div.className = 'expense-item';
+      div.innerHTML = `<span>${exp.category}</span><span>₹${exp.amount.toFixed(2)}</span>`;
+      list.appendChild(div);
+    });
+  }
+
+  function updateSummary() {
+    const income = parseFloat(document.getElementById('income').value) || 0;
+    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const savings = income - totalExpenses;
+
+    document.getElementById('summary').style.display = 'block';
+    document.getElementById('sumIncome').textContent = '₹' + income.toFixed(2);
+    document.getElementById('sumExpenses').textContent = '₹' + totalExpenses.toFixed(2);
+
+    const savingsEl = document.getElementById('sumSavings');
+    savingsEl.textContent = '₹' + savings.toFixed(2);
+    savingsEl.className = savings >= 0 ? 'savings-positive' : 'savings-negative';
+
+    const categories = {};
+    expenses.forEach(e => {
+      categories[e.category] = (categories[e.category] || 0) + e.amount;
+    });
+
+    const breakdown = document.getElementById('categoryBreakdown');
+    breakdown.innerHTML = '<strong>By Category:</strong><br>' +
+      Object.entries(categories).map(([cat, amt]) => `${cat}: ₹${amt.toFixed(2)}`).join('<br>');
+  }
+
+  function resetAll() {
+    expenses = [];
+    document.getElementById('income').value = '';
+    document.getElementById('expenseList').innerHTML = '';
+    document.getElementById('summary').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
