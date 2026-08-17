@@ -1,0 +1,19 @@
+START
+  Get income from user
+  Initialize total_expenses = 0
+  Initialize categories = {} (empty dictionary)
+
+  WHILE user wants to add an expense:
+      Get expense_amount, expense_category
+      Add expense_amount to total_expenses
+      Add expense_amount to categories[expense_category]
+
+  Calculate savings = income - total_expenses
+
+  DISPLAY summary:
+      Total Income
+      Total Expenses
+      Savings (or Deficit if negative)
+      Expenses grouped by Category
+
+END
